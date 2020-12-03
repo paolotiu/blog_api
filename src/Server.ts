@@ -13,6 +13,21 @@ import logger from './shared/Logger';
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
 
+import mongoose from 'mongoose';
+
+/************************************************************************************
+ *                              Set mongoose settings
+ ***********************************************************************************/
+mongoose.connect(process.env.MONGODB_URI as string, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+});
+const db = mongoose.connection;
+// eslint-disable-next-line no-console
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+    // we're connected!
+});
 /************************************************************************************
  *                              Set basic express settings
  ***********************************************************************************/

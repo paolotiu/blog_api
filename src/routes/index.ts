@@ -7,6 +7,6 @@ const router = Router();
 router.use('/users', (req, res, next) => {
     res.json('U');
 });
-console.log(process.env.FOO);
+
 // Export the base-router
 export default router;
