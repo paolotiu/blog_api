@@ -1,5 +1,12 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 
+export interface IBlog extends mongoose.Document {
+    title: string;
+    timestamp: Date;
+    text: string;
+    author: string;
+    comments: string[];
+}
 const BlogSchema = new Schema({
     title: { type: String, required: true, maxlength: 40 },
     timestamp: Date,
@@ -8,4 +15,4 @@ const BlogSchema = new Schema({
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
 });
 
-export default model('Blog', BlogSchema);
+export default model<IBlog>('Blog', BlogSchema);
