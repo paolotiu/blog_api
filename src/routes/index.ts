@@ -8,8 +8,9 @@ router.use('/users', (req, res, next) => {
     res.json('U');
 });
 
-router.use('/blogs', blogController.blogs_get);
+router.get('/blogs', blogController.blogs_get);
 router.post('/blogs', blogController.blog_post);
+router.get('/blogs/:id', blogController.specific_blog_get);
 
 // Export the base-router
 export default router;
