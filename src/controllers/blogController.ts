@@ -3,14 +3,12 @@ import { RequestHandler } from 'express';
 import {} from 'mongoose';
 
 const blogs_get: RequestHandler = (req, res, next) => {
-    console.log('there');
     Blog.find({}).exec((err, docs) => {
         res.json(docs);
     });
 };
 
 const blog_post: RequestHandler = (req, res) => {
-    console.log(req.body);
     const { title, text } = req.body;
     const blog = new Blog({
         title,
@@ -24,6 +22,15 @@ const blog_post: RequestHandler = (req, res) => {
     });
 };
 
+const blog_delete: RequestHandler = (req, res, next) => {
+    const { id } = req.params;
+    Blog.findByIdAndRemove(id).exec((err, blog) => {
+        if (err) return res.json(err);
+
+        return res.json('Success');
+    });
+};
+
 const specific_blog_get: RequestHandler = (req, res, next) => {
     const { id } = req.params;
     Blog.findById(id).exec((err, blog) => {
@@ -32,4 +39,4 @@ const specific_blog_get: RequestHandler = (req, res, next) => {
     });
 };
 
-export { blogs_get, blog_post, specific_blog_get };
+export { blogs_get, blog_post, specific_blog_get, blog_delete };
