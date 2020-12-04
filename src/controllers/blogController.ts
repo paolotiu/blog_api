@@ -35,7 +35,11 @@ const specific_blog_get: RequestHandler = (req, res, next) => {
     const { id } = req.params;
     Blog.findById(id).exec((err, blog) => {
         if (err) return res.json(err);
-        return res.json(blog);
+        if (blog) {
+            return res.json(blog);
+        } else {
+            return res.status(400).json('{error: Blog not found}');
+        }
     });
 };
 
