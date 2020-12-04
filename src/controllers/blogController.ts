@@ -1,16 +1,18 @@
 import { Blog } from '../models/Models';
 import { RequestHandler } from 'express';
+
 import {} from 'mongoose';
 
-const blogs_get: RequestHandler = (req, res, next) => {
+const getAllBlogs: RequestHandler = (req, res, next) => {
     Blog.find({}).exec((err, docs) => {
         if (err) res.status(400).json(err);
         res.json(docs);
     });
 };
 
-const blog_post: RequestHandler = (req, res) => {
+const postBlog: RequestHandler = (req, res) => {
     const { title, text } = req.body;
+
     const blog = new Blog({
         title,
         text,
@@ -23,7 +25,7 @@ const blog_post: RequestHandler = (req, res) => {
     });
 };
 
-const blog_delete: RequestHandler = (req, res, next) => {
+const deleteBlog: RequestHandler = (req, res, next) => {
     const { id } = req.params;
     Blog.findByIdAndRemove(id).exec((err, blog) => {
         if (err) return res.status(400).json(err);
@@ -32,7 +34,7 @@ const blog_delete: RequestHandler = (req, res, next) => {
     });
 };
 
-const specific_blog_get: RequestHandler = (req, res, next) => {
+const getBlogById: RequestHandler = (req, res, next) => {
     const { id } = req.params;
     Blog.findById(id).exec((err, blog) => {
         if (err) return res.status(400).json(err);
@@ -44,4 +46,4 @@ const specific_blog_get: RequestHandler = (req, res, next) => {
     });
 };
 
-export { blogs_get, blog_post, specific_blog_get, blog_delete };
+export { getAllBlogs, postBlog, getBlogById, deleteBlog };
