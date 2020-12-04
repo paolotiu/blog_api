@@ -1,6 +1,11 @@
 import * as blogs from './blogController';
+import * as user from './userController';
 
 const blogController = {
     ...blogs,
 };
-export { blogController };
+
+const userController = {
+    ...user,
+};
+export { blogController, userController };
