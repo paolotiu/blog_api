@@ -11,6 +11,6 @@ router.use('/users', (req, res, next) => {
 router.get('/blogs', blogController.blogs_get);
 router.post('/blogs', blogController.blog_post);
 router.get('/blogs/:id', blogController.specific_blog_get);
-
+router.delete('/blogs/:id', blogController.blog_delete);
 // Export the base-router
 export default router;
