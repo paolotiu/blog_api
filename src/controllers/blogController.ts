@@ -1,3 +1,4 @@
+import { IUser } from './../models/User';
 import { Blog, User } from '../models/Models';
 import { json, RequestHandler } from 'express';
 import {} from './';
@@ -16,13 +17,17 @@ const getAllBlogs: RequestHandler = (req, res, next) => {
 const postBlog: RequestHandler[] = [
     passport.authenticate('jwt', { session: false }),
     (req, res) => {
-        return res.json(req.user);
         const { title, text } = req.body;
-        User.findOne();
+
+        // Check if user exist / Sanity check
+        if (!req.user) {
+            return res.status(403).json({ error: "User doesn't exists" });
+        }
         const blog = new Blog({
             title,
             text,
             timestamp: new Date(),
+            author: (req.user as IUser)._id,
         });
 
         blog.save((err, doc) => {
@@ -31,14 +36,29 @@ const postBlog: RequestHandler[] = [
         });
     },
 ];
-const deleteBlog: RequestHandler = (req, res, next) => {
-    const { id } = req.params;
-    Blog.findByIdAndRemove(id).exec((err, blog) => {
-        if (err) return res.status(400).json(err);
 
-        return res.json('Success');
-    });
-};
+const deleteBlog: RequestHandler[] = [
+    passport.authenticate('jwt', { session: false }),
+    (req, res, next) => {
+        // Check if user exist / Sanity check
+        if (!req.user) {
+            return res.status(403).json({ error: "User doesn't exists" });
+        }
+        const { id } = req.params;
+        Blog.findByIdAndRemove(id).exec((err, blog) => {
+            if (err) return res.status(400).json(err);
+            if (!blog) {
+                return res.status(404).json({ error: 'Blog not found' });
+            } else {
+                if (blog.author !== (req.user as IUser)._id) {
+                    return res.status(403).json({ error: 'Not Authorized' });
+                } else {
+                    return res.json({ message: 'Success', blog });
+                }
+            }
+        });
+    },
+];
 
 const getBlogById: RequestHandler = (req, res, next) => {
     const { id } = req.params;
