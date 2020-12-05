@@ -59,11 +59,6 @@ export const postSignUp: RequestHandler = (req, res, next) => {
         return res.status(401).json(result.error.details[0].message);
     }
 
-    // Check if user exists
-    const conflict = {
-        isConflict: false,
-        message: '',
-    };
     User.findOne({
         $or: [{ email: email }, { username: username }],
     }).exec((err, user) => {
