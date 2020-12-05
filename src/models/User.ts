@@ -4,6 +4,7 @@ export interface IUser extends mongoose.Document {
     username: string;
     password: string;
     email: string;
+    _id?: string;
 }
 const UserSchema = new Schema({
     username: String,
