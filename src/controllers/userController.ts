@@ -60,33 +60,39 @@ export const postSignUp: RequestHandler = (req, res, next) => {
     }
 
     // Check if user exists
-    User.findOne({ $or: [{ email: email }, { username: username }] }).exec(
-        (err, user) => {
-            if (err) return res.status(400).json(err);
-            if (user) {
-                if (user.email === email) {
-                    return res
-                        .sendStatus(409)
-                        .json({ error: 'User with same email already exists' });
-                } else if (user.username === password) {
-                    return res.sendStatus(409).json({
-                        error: 'User with same username already exists',
-                    });
-                }
-            }
-        }
-    );
-
-    // Save user to db
-    const user = new User({
-        username,
-        password,
-        email,
-    });
-
-    user.save((err, user) => {
+    const conflict = {
+        isConflict: false,
+        message: '',
+    };
+    User.findOne({
+        $or: [{ email: email }, { username: username }],
+    }).exec((err, user) => {
         if (err) return res.status(400).json(err);
+        if (user) {
+            // User with same params exists
+            if (user.email === email) {
+                return res.status(409).json({
+                    error: 'User with the same email already exists',
+                });
+            } else if (user.username === password) {
+                return res.status(409).json({
+                    error: 'User with the same username already exists',
+                });
+            }
+        } else {
+            // No existing user with conflicting params
+            // Save user to db
+            const user = new User({
+                username,
+                password,
+                email,
+            });
 
-        res.json(user);
+            user.save((err, user) => {
+                if (err) return res.status(400).json(err);
+
+                return res.json(user);
+            });
+        }
     });
 };
