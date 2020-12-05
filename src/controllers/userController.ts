@@ -6,8 +6,7 @@ import * as jwt from 'jsonwebtoken';
 
 //passport
 import passport from 'passport';
-import jwtStrategy from './jwtStrategy';
-passport.use(jwtStrategy);
+
 export const postLogin: RequestHandler = (req, res, next) => {
     const { password } = req.body;
     const username = (req.body.username as string).toLowerCase();

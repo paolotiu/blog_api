@@ -1,7 +1,10 @@
-import { Blog } from '../models/Models';
-import { RequestHandler } from 'express';
-
+import { Blog, User } from '../models/Models';
+import { json, RequestHandler } from 'express';
+import {} from './';
 import {} from 'mongoose';
+
+//passport
+import passport from 'passport';
 
 const getAllBlogs: RequestHandler = (req, res, next) => {
     Blog.find({}).exec((err, docs) => {
@@ -10,21 +13,24 @@ const getAllBlogs: RequestHandler = (req, res, next) => {
     });
 };
 
-const postBlog: RequestHandler = (req, res) => {
-    const { title, text } = req.body;
+const postBlog: RequestHandler[] = [
+    passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        return res.json(req.user);
+        const { title, text } = req.body;
+        User.findOne();
+        const blog = new Blog({
+            title,
+            text,
+            timestamp: new Date(),
+        });
 
-    const blog = new Blog({
-        title,
-        text,
-        timestamp: new Date(),
-    });
-
-    blog.save((err, doc) => {
-        if (err) return res.status(400).json(err);
-        return res.json(doc);
-    });
-};
-
+        blog.save((err, doc) => {
+            if (err) return res.status(400).json(err);
+            return res.json(doc);
+        });
+    },
+];
 const deleteBlog: RequestHandler = (req, res, next) => {
     const { id } = req.params;
     Blog.findByIdAndRemove(id).exec((err, blog) => {

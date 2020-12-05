@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
+import { User } from '../models/Models';
 import {
     Strategy as JwtStrategy,
     ExtractJwt,
@@ -19,6 +20,16 @@ interface Payload {
 }
 
 const cb: VerifyCallback = (payload: Payload, done) => {
-    return done(null, true);
+    User.findOne({ username: payload.username }).exec((err, user) => {
+        if (err) {
+            return done(err, false);
+        }
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+            // or you could create a new account
+        }
+    });
 };
 export default new JwtStrategy(opts, cb);
