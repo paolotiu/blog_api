@@ -1,11 +1,9 @@
-import { RequestHandler, Request } from 'express';
-
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+import { RequestHandler } from 'express';
+import bcrypt from 'bcryptjs';
 import { User } from '../models/Models';
 import { userSchema } from './validation';
 import * as jwt from 'jsonwebtoken';
-
-//passport
-import passport from 'passport';
 
 export const postLogin: RequestHandler = (req, res, next) => {
     const { password } = req.body;
@@ -15,18 +13,20 @@ export const postLogin: RequestHandler = (req, res, next) => {
         password: password,
         email: 'dummyemail@email.com',
     });
+
     // If validtion didn't pass
     if (result.error) {
         return res.status(401).json(result.error.details[0].message);
     }
     User.findOne({ username: username }).exec((err, user) => {
-        if (err) return res.status(400).json(err);
+        if (err) return res.status(400).json({ error: err.message });
 
         if (!user) {
             return res
                 .status(403)
                 .json({ error: 'Invalid username or password' });
-        } else if (user.password === password) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        } else if (bcrypt.compareSync(password, user.password)) {
             const token = jwt.sign(
                 { username: user.username, email: user.email },
                 process.env.JWT_SECRET as string,
@@ -47,7 +47,8 @@ export const postLogin: RequestHandler = (req, res, next) => {
 export const postSignUp: RequestHandler = (req, res, next) => {
     const { password, email } = req.body;
     const username = (req.body.username as string).toLowerCase();
-
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    const hashedPassword = bcrypt.hashSync(password, 10);
     // Check Joi validation
     const result = userSchema.validate({
         username: username,
@@ -62,14 +63,14 @@ export const postSignUp: RequestHandler = (req, res, next) => {
     User.findOne({
         $or: [{ email: email }, { username: username }],
     }).exec((err, user) => {
-        if (err) return res.status(400).json(err);
+        if (err) return res.status(400).json({ error: err.message });
         if (user) {
             // User with same params exists
             if (user.email === email) {
                 return res.status(409).json({
                     error: 'User with the same email already exists',
                 });
-            } else if (user.username === password) {
+            } else if (user.username === username) {
                 return res.status(409).json({
                     error: 'User with the same username already exists',
                 });
@@ -79,14 +80,20 @@ export const postSignUp: RequestHandler = (req, res, next) => {
             // Save user to db
             const user = new User({
                 username,
-                password,
+                password: hashedPassword,
                 email,
             });
 
             user.save((err, user) => {
-                if (err) return res.status(400).json(err);
+                if (err) return res.status(400).json({ error: err.message });
 
-                return res.json(user);
+                return res.json({
+                    message: 'Signed Up Succesfully',
+                    user: {
+                        email: email,
+                        username: username,
+                    },
+                });
             });
         }
     });
