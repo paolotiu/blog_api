@@ -1,6 +1,6 @@
-import { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 
-interface IMessage extends Document {
+interface IMessage extends mongoose.Document {
     timestamp: Date;
     text: string;
     author: string;
