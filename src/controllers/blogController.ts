@@ -53,7 +53,12 @@ export const updateBlog: RequestHandler[] = [
             text,
         };
 
-        Blog.findOneAndUpdate({ _id: id }, { text: text, title }).exec();
+        Blog.findOneAndUpdate({ _id: id }, { text: text, title }).exec(
+            (err, blog) => {
+                if (err) return res.status(400).json({ error: err.message });
+                res.json(blog);
+            }
+        );
     },
 ];
 
@@ -66,7 +71,7 @@ export const deleteBlog: RequestHandler[] = [
         }
         const { id } = req.params;
         Blog.findByIdAndRemove(id).exec((err, blog) => {
-            if (err) return res.status(400).json(err);
+            if (err) return res.status(400).json({ error: err.message });
             if (!blog) {
                 return res.status(404).json({ error: 'Blog not found' });
             } else {
