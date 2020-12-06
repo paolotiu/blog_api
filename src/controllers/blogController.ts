@@ -9,7 +9,7 @@ import passport from 'passport';
 
 export const getAllBlogs: RequestHandler = (req, res) => {
     Blog.find({})
-        .populate('author')
+        .populate('author', 'username email')
         .exec((err, docs) => {
             if (err) res.status(400).json({ error: err.message });
             res.json(docs);
