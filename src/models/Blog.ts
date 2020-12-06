@@ -12,7 +12,7 @@ const BlogSchema = new Schema({
     timestamp: Date,
     text: String,
     author: { type: Schema.Types.ObjectId, ref: 'User' },
-    comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
+    comments: [{ type: Schema.Types.ObjectId, ref: 's' }],
 });
 
 export default model<IBlog>('Blog', BlogSchema);
