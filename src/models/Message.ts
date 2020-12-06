@@ -1,10 +1,16 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, Document } from 'mongoose';
+
+interface IMessage extends Document {
+    timestamp: Date;
+    text: string;
+    author: string;
+    _id: string;
+}
 
 const MessageSchema = new Schema({
-    blog: { type: Schema.Types.ObjectId, ref: 'User' },
     timestamp: Date,
     text: String,
-    author: { type: Schema.Types.ObjectId, ref: 'User' },
+    author: String,
 });
 
-export default model('Message', MessageSchema);
+export default model<IMessage>('Message', MessageSchema);
