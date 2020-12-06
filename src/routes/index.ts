@@ -4,7 +4,7 @@ import { blogController, userController } from '../controllers';
 const router = Router();
 
 // Add sub-routes
-router.use('/users', (req, res, next) => {
+router.use('/users', (req, res) => {
     res.json('U');
 });
 

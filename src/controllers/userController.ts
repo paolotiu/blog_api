@@ -5,7 +5,7 @@ import { User } from '../models/Models';
 import { userSchema } from './validation';
 import * as jwt from 'jsonwebtoken';
 
-export const postLogin: RequestHandler = (req, res, next) => {
+export const postLogin: RequestHandler = (req, res) => {
     const { password } = req.body;
     const username = (req.body.username as string).toLowerCase();
     const result = userSchema.validate({
@@ -44,7 +44,7 @@ export const postLogin: RequestHandler = (req, res, next) => {
     });
 };
 
-export const postSignUp: RequestHandler = (req, res, next) => {
+export const postSignUp: RequestHandler = (req, res) => {
     const { password, email } = req.body;
     const username = (req.body.username as string).toLowerCase();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -84,7 +84,7 @@ export const postSignUp: RequestHandler = (req, res, next) => {
                 email,
             });
 
-            user.save((err, user) => {
+            user.save((err) => {
                 if (err) return res.status(400).json({ error: err.message });
 
                 return res.json({

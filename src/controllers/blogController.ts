@@ -1,13 +1,13 @@
 import { IUser } from './../models/User';
-import { Blog, User, Message } from '../models/Models';
-import { json, RequestHandler } from 'express';
+import { Blog, Message } from '../models/Models';
+import { RequestHandler } from 'express';
 import {} from './';
 import {} from 'mongoose';
 
 //passport
 import passport from 'passport';
 
-export const getAllBlogs: RequestHandler = (req, res, next) => {
+export const getAllBlogs: RequestHandler = (req, res) => {
     Blog.find({}).exec((err, docs) => {
         if (err) res.status(400).json({ error: err.message });
         res.json(docs);
@@ -48,11 +48,6 @@ export const updateBlog: RequestHandler[] = [
             return res.status(403).json({ error: "User doesn't exists" });
         }
 
-        const update = {
-            title,
-            text,
-        };
-
         Blog.findOneAndUpdate({ _id: id }, { text: text, title }).exec(
             (err, blog) => {
                 if (err) return res.status(400).json({ error: err.message });
@@ -64,7 +59,7 @@ export const updateBlog: RequestHandler[] = [
 
 export const deleteBlog: RequestHandler[] = [
     passport.authenticate('jwt', { session: false }),
-    (req, res, next) => {
+    (req, res) => {
         // Check if user exist / Sanity check
         if (!req.user) {
             return res.status(403).json({ error: "User doesn't exists" });
@@ -85,7 +80,7 @@ export const deleteBlog: RequestHandler[] = [
     },
 ];
 
-export const getBlogById: RequestHandler = (req, res, next) => {
+export const getBlogById: RequestHandler = (req, res) => {
     const { id } = req.params;
     Blog.findById(id)
         .populate('comments')
@@ -113,7 +108,7 @@ export const commentOnBlog: RequestHandler = (req, res) => {
         if (err) return res.status(400).json({ error: err.message });
         Blog.findByIdAndUpdate(blogId, {
             $push: { comments: doc._id },
-        }).exec((err, blog) => {
+        }).exec((err) => {
             if (err) return res.status(400).json({ error: err.message });
             return res.json(doc);
         });
