@@ -16,5 +16,7 @@ router.get('/blogs', blogController.getAllBlogs);
 router.post('/blogs', blogController.postBlog);
 router.get('/blogs/:id', blogController.getBlogById);
 router.delete('/blogs/:id', blogController.deleteBlog);
+router.put('/blogs/:id', blogController.updateBlog);
+router.post('/blogs/:id/comment', blogController.commentOnBlog);
 // Export the base-router
 export default router;
