@@ -1,5 +1,5 @@
 import { IUser } from './../models/User';
-import { Blog, User } from '../models/Models';
+import { Blog, User, Message } from '../models/Models';
 import { json, RequestHandler } from 'express';
 import {} from './';
 import {} from 'mongoose';
@@ -7,14 +7,14 @@ import {} from 'mongoose';
 //passport
 import passport from 'passport';
 
-const getAllBlogs: RequestHandler = (req, res, next) => {
+export const getAllBlogs: RequestHandler = (req, res, next) => {
     Blog.find({}).exec((err, docs) => {
-        if (err) res.status(400).json(err);
+        if (err) res.status(400).json({ error: err.message });
         res.json(docs);
     });
 };
 
-const postBlog: RequestHandler[] = [
+export const postBlog: RequestHandler[] = [
     passport.authenticate('jwt', { session: false }),
     (req, res) => {
         const { title, text } = req.body;
@@ -31,13 +31,33 @@ const postBlog: RequestHandler[] = [
         });
 
         blog.save((err, doc) => {
-            if (err) return res.status(400).json(err);
+            if (err) return res.status(400).json({ error: err.message });
             return res.json(doc);
         });
     },
 ];
 
-const deleteBlog: RequestHandler[] = [
+export const updateBlog: RequestHandler[] = [
+    passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        const { id } = req.params;
+        const { title, text } = req.body;
+
+        // Check if user exist / Sanity check
+        if (!req.user) {
+            return res.status(403).json({ error: "User doesn't exists" });
+        }
+
+        const update = {
+            title,
+            text,
+        };
+
+        Blog.findOneAndUpdate({ _id: id }, { text: text, title }).exec();
+    },
+];
+
+export const deleteBlog: RequestHandler[] = [
     passport.authenticate('jwt', { session: false }),
     (req, res, next) => {
         // Check if user exist / Sanity check
@@ -60,16 +80,37 @@ const deleteBlog: RequestHandler[] = [
     },
 ];
 
-const getBlogById: RequestHandler = (req, res, next) => {
+export const getBlogById: RequestHandler = (req, res, next) => {
     const { id } = req.params;
-    Blog.findById(id).exec((err, blog) => {
-        if (err) return res.status(400).json(err);
-        if (blog) {
-            return res.json(blog);
-        } else {
-            return res.status(404).json('{error: Blog not found}');
-        }
-    });
+    Blog.findById(id)
+        .populate('comments')
+        .exec((err, blog) => {
+            if (err) return res.status(400).json({ error: err.message });
+            if (blog) {
+                return res.json(blog);
+            } else {
+                return res.status(404).json('{error: Blog not found}');
+            }
+        });
 };
 
-export { getAllBlogs, postBlog, getBlogById, deleteBlog };
+export const commentOnBlog: RequestHandler = (req, res) => {
+    const { author, text } = req.body;
+    const blogId = req.params.id;
+
+    const comment = new Message({
+        author,
+        text,
+        timestamp: new Date(),
+    });
+
+    comment.save((err, doc) => {
+        if (err) return res.status(400).json({ error: err.message });
+        Blog.findByIdAndUpdate(blogId, {
+            $push: { comments: doc._id },
+        }).exec((err, blog) => {
+            if (err) return res.status(400).json({ error: err.message });
+            return res.json(doc);
+        });
+    });
+};
