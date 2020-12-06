@@ -2,4 +2,3 @@ node_modules
 env
 dist
 jet-logger.log
-preStart.ts
