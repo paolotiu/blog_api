@@ -86,6 +86,7 @@ export const getBlogById: RequestHandler = (req, res) => {
     const { id } = req.params;
     Blog.findById(id)
         .populate('comments')
+        .populate('author', 'username email')
         .exec((err, blog) => {
             if (err) return res.status(400).json({ error: err.message });
             if (blog) {
