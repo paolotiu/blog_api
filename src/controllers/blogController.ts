@@ -1,8 +1,7 @@
+import { commentSchema } from './validation';
 import { IUser } from './../models/User';
 import { Blog, Message } from '../models/Models';
 import { RequestHandler } from 'express';
-import {} from './';
-import {} from 'mongoose';
 
 //passport
 import passport from 'passport';
@@ -105,6 +104,14 @@ export const getBlogById: RequestHandler = (req, res) => {
 export const commentOnBlog: RequestHandler = (req, res) => {
     const { author, text } = req.body;
     const blogId = req.params.id;
+    const result = commentSchema.validate({
+        author: author,
+        text: text,
+    });
+
+    if (result.error) {
+        return res.status(401).json(result.error.details[0].message);
+    }
 
     const comment = new Message({
         author,

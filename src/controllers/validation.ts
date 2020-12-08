@@ -18,3 +18,8 @@ export const userSchema = Joi.object({
 export const blogSchema = Joi.object({
     title: Joi.string(),
 });
+
+export const commentSchema = Joi.object({
+    author: Joi.string().trim().alphanum().max(16).required(),
+    text: Joi.string().trim().required(),
+});
