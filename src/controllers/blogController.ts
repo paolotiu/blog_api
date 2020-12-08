@@ -85,7 +85,12 @@ export const deleteBlog: RequestHandler[] = [
 export const getBlogById: RequestHandler = (req, res) => {
     const { id } = req.params;
     Blog.findById(id)
-        .populate('comments')
+        .populate({
+            path: 'sort',
+            options: {
+                sort: { timestamp: -1 },
+            },
+        })
         .populate('author', 'username email')
         .exec((err, blog) => {
             if (err) return res.status(400).json({ error: err.message });
