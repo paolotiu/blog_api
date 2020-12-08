@@ -85,7 +85,7 @@ export const getBlogById: RequestHandler = (req, res) => {
     const { id } = req.params;
     Blog.findById(id)
         .populate({
-            path: 'sort',
+            path: 'comments',
             options: {
                 sort: { timestamp: -1 },
             },
