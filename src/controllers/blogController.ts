@@ -58,6 +58,16 @@ export const updateBlog: RequestHandler[] = [
     },
 ];
 
+export const getOwnBlogs: RequestHandler[] = [
+    passport.authenticate('jwt', { session: false }),
+    (req, res) => {
+        Blog.find({ author: (req.user as IUser)._id }).exec((err, blogs) => {
+            if (err) return res.status(400).json({ error: err.message });
+
+            return res.json(blogs);
+        });
+    },
+];
 export const deleteBlog: RequestHandler[] = [
     passport.authenticate('jwt', { session: false }),
     (req, res) => {

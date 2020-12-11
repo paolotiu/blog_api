@@ -11,7 +11,7 @@ router.use('/users', (req, res) => {
 router.get('/user', userController.getUser);
 router.post('/user/login', userController.postLogin);
 router.post('/user/signup', userController.postSignUp);
-
+router.get('/user/blogs', blogController.getOwnBlogs);
 // Blog routes
 router.get('/blogs', blogController.getAllBlogs);
 router.post('/blogs', blogController.postBlog);
