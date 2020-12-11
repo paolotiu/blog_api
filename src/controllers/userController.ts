@@ -5,19 +5,13 @@ import { User } from '../models/Models';
 import { userSchema } from './validation';
 import * as jwt from 'jsonwebtoken';
 
+//passport
+import passport from 'passport';
+
 export const postLogin: RequestHandler = (req, res) => {
     const { password } = req.body;
     const username = (req.body.username as string).toLowerCase();
-    const result = userSchema.validate({
-        username: username,
-        password: password,
-        email: 'dummyemail@email.com',
-    });
 
-    // If validtion didn't pass
-    if (result.error) {
-        return res.status(401).json(result.error.details[0].message);
-    }
     User.findOne({ username: username }).exec((err, user) => {
         if (err) return res.status(400).json({ error: err.message });
 
@@ -31,11 +25,18 @@ export const postLogin: RequestHandler = (req, res) => {
                 { username: user.username, email: user.email },
                 process.env.JWT_SECRET as string,
                 {
-                    expiresIn: '120s',
+                    expiresIn: '3d',
                 }
             );
 
-            return res.status(200).json({ message: 'Auth Passed', token });
+            return res.status(200).json({
+                message: 'Auth Passed',
+                token,
+                user: {
+                    username: user.username,
+                    email: user.email,
+                },
+            });
         } else {
             return res
                 .status(403)
@@ -98,3 +99,17 @@ export const postSignUp: RequestHandler = (req, res) => {
         }
     });
 };
+
+export const getUser: RequestHandler[] = [
+    (req, res, next) => {
+        passport.authenticate('jwt', { session: false }, (err, user, info) => {
+            if (err) {
+                return next(err);
+            }
+            if (!user) {
+                return res.status(403).json({ error: 'Unauthorized' });
+            }
+            return res.json({ username: user.username, email: user.email });
+        })(req, res, next);
+    },
+];

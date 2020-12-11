@@ -8,6 +8,7 @@ router.use('/users', (req, res) => {
     res.json('U');
 });
 
+router.get('/user', userController.getUser);
 router.post('/user/login', userController.postLogin);
 router.post('/user/signup', userController.postSignUp);
 
