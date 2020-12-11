@@ -36,7 +36,7 @@ db.once('open', function () {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({ origin: 'https://blog-pt.netlify.app' }));
 
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {
