@@ -52,6 +52,13 @@ export const updateBlog: RequestHandler[] = [
         Blog.findOneAndUpdate({ _id: id }, { text: text, title }).exec(
             (err, blog) => {
                 if (err) return res.status(400).json({ error: err.message });
+                if (!blog) {
+                    return res.status(404).json({ error: 'Blog not found' });
+                }
+
+                if (blog.author !== (req.user as IUser)._id) {
+                    return res.status(403).json({ error: 'Not Authorized' });
+                }
                 res.json(blog);
             }
         );
@@ -76,14 +83,27 @@ export const deleteBlog: RequestHandler[] = [
             return res.status(403).json({ error: "User doesn't exists" });
         }
         const { id } = req.params;
+
+        //Check if author and user lines up
+        Blog.findById(id).exec((err, blog) => {
+            if (err) return res.status(400).json({ error: err.message });
+            if (!blog) {
+                return res.status(404).json({ error: 'Blog not found' });
+            }
+            if (
+                blog.author.toString() !== (req.user as IUser)._id?.toString()
+            ) {
+                return res.status(403).json({ error: 'Not Authorized' });
+            }
+        });
+
+        //Remove Blog
         Blog.findByIdAndRemove(id).exec((err, blog) => {
             if (err) return res.status(400).json({ error: err.message });
             if (!blog) {
                 return res.status(404).json({ error: 'Blog not found' });
             } else {
-                if (blog.author !== (req.user as IUser)._id) {
-                    return res.status(403).json({ error: 'Not Authorized' });
-                } else {
+                {
                     return res.json({ message: 'Success', blog });
                 }
             }
