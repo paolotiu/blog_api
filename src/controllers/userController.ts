@@ -58,7 +58,7 @@ export const postSignUp: RequestHandler = (req, res) => {
     });
     // If validtion didn't pass
     if (result.error) {
-        return res.status(401).json(result.error.details[0].message);
+        return res.status(401).json({ error: result.error.details[0].message });
     }
 
     User.findOne({
