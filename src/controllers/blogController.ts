@@ -5,6 +5,7 @@ import { RequestHandler } from 'express';
 
 //passport
 import passport from 'passport';
+import { exec } from 'child_process';
 
 export const getAllBlogs: RequestHandler = (req, res) => {
     Blog.find({})
@@ -59,20 +60,21 @@ export const updateBlog: RequestHandler[] = [
         if (!req.user) {
             return res.status(403).json({ error: "User doesn't exists" });
         }
-
-        Blog.findOneAndUpdate({ _id: id }, { text: text, title }).exec(
-            (err, blog) => {
-                if (err) return res.status(400).json({ error: err.message });
-                if (!blog) {
-                    return res.status(404).json({ error: 'Blog not found' });
-                }
-
-                if (blog.author !== (req.user as IUser)._id) {
-                    return res.status(403).json({ error: 'Not Authorized' });
-                }
-                res.json(blog);
+        Blog.findById(id).exec((err, blog) => {
+            if (err) return res.status(400).json({ error: err.message });
+            if (!blog) {
+                return res.status(404).json({ error: 'Blog not found' });
+            } else if (
+                blog.author.toString() !== (req.user as IUser)._id?.toString()
+            ) {
+                return res.status(403).json({ error: 'Not Authorized' });
             }
-        );
+
+            blog.update({ text, title }).exec((err, blog) => {
+                if (err) return res.status(400).json({ error: err.message });
+                return res.json(blog);
+            });
+        });
     },
 ];
 
