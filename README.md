@@ -1,6 +1,7 @@
 # Blog API 
-> Blog Client [Repo](https://github.com/paolotiu17/blog_client)
-> Blog Client [Live Website](https://blog-pt.netlify.app)
+> Blog Client [Repo](https://github.com/paolotiu17/blog_client) 💼
+
+> Blog Client [Live Website](https://blog-pt.netlify.app) 👌
 
 
 ## Description
@@ -23,7 +24,7 @@ An API for operating the blog backend
 | PUT | /blogs/:id | Update a blog| | ✅|
 | POST | /blogs/:id/comment | Post a comment on a blog| author*, text*|
 
-###### required (*)
+*required (\*)*
 
 
 
