@@ -20,7 +20,7 @@ export const postLogin: RequestHandler = (req, res) => {
                 .status(403)
                 .json({ error: 'Invalid username or password' });
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        } else if (bcrypt.compareSync(password, user.password)) {
+        } else if (bcrypt.compareSync(password, user.password as string)) {
             const token = jwt.sign(
                 { username: user.username, email: user.email },
                 process.env.JWT_SECRET as string,
@@ -102,7 +102,7 @@ export const postSignUp: RequestHandler = (req, res) => {
 
 export const getUser: RequestHandler[] = [
     (req, res, next) => {
-        passport.authenticate('jwt', { session: false }, (err, user, info) => {
+        passport.authenticate('jwt', { session: false }, (err, user) => {
             if (err) {
                 return next(err);
             }

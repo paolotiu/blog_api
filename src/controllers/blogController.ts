@@ -33,7 +33,18 @@ export const postBlog: RequestHandler[] = [
 
         blog.save((err, doc) => {
             if (err) return res.status(400).json({ error: err.message });
-            return res.json(doc);
+
+            doc.populate(
+                {
+                    path: 'author',
+                    select: 'username email',
+                },
+                (err, doc) => {
+                    if (err)
+                        return res.status(400).json({ error: err.message });
+                    return res.json(doc);
+                }
+            );
         });
     },
 ];
