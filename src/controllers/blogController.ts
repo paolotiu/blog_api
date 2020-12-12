@@ -70,8 +70,9 @@ export const updateBlog: RequestHandler[] = [
                 return res.status(403).json({ error: 'Not Authorized' });
             }
 
-            blog.update({ text, title }).exec((err, blog) => {
+            Blog.findByIdAndUpdate(id, { text, title }).exec((err, blog) => {
                 if (err) return res.status(400).json({ error: err.message });
+
                 return res.json(blog);
             });
         });
